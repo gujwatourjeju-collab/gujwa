@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>구좌마을여행사협동조합</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ═══ RESET & ROOT ═══ */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Noto Sans KR',sans-serif;background:#0d1614;color:#e8f4f3;font-size:14px;-webkit-font-smoothing:antialiased}
+
+:root{
+  --tl:#00b5b0;--tld:#009490;--tldd:#007a76;--tll:rgba(0,181,176,.12);--tlm:rgba(0,181,176,.25);
+  --dk:#0d1614;--dk2:#131c1a;--dk3:#1a2624;--dk4:#212e2c;
+  --lt:#e8f4f3;--lt2:#b8d4d2;--lt3:#7aadaa;--lt4:#4a8a87;
+  --ok:#10b981;--okl:rgba(16,185,129,.15);
+  --wa:#f59e0b;--wal:rgba(245,158,11,.15);
+  --er:#ef4444;--erl:rgba(239,68,68,.15);
+  --pu:#8b5cf6;--pul:rgba(139,92,246,.15);
+  --pk:#ec4899;--pkl:rgba(236,72,153,.15);
+  --r:14px;--rs:8px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+
+/* ═══ SCREENS ═══ */
+.screen{position:fixed;inset:0;display:none;flex-direction:column;overflow:hidden;background:var(--dk)}
+.screen.active{display:flex}
+
+/* ═══ LOGIN SCREEN ═══ */
+#s-login{background:linear-gradient(160deg,#0d2420 0%,#0d1614 50%,#091210 100%);align-items:center;justify-content:center}
+.login-wrap{width:100%;max-width:380px;padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:0}
+.login-logo{width:110px;height:90px;object-fit:contain;margin-bottom:16px;filter:brightness(1.1)}
+.login-brand{text-align:center;margin-bottom:32px}
+.login-brand h1{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1.3}
+.login-brand p{font-size:11px;color:var(--tl);margin-top:5px;font-weight:600;letter-spacing:.8px}
+.login-form{width:100%;background:var(--dk3);border-radius:20px;padding:24px 20px;border:1px solid rgba(0,181,176,.15);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.lf-title{font-size:13px;font-weight:700;color:var(--lt2);margin-bottom:18px;text-align:center;letter-spacing:.3px}
+.lf-group{margin-bottom:14px}
+.lf-label{font-size:11px;font-weight:600;color:var(--lt3);display:block;margin-bottom:6px;letter-spacing:.3px}
+.lf-input{width:100%;background:var(--dk4);border:1.5px solid rgba(0,181,176,.2);border-radius:10px;padding:13px 14px;color:#fff;font-family:inherit;font-size:15px;outline:none;transition:border-color .15s;-webkit-appearance:none}
+.lf-input:focus{border-color:var(--tl);box-shadow:0 0 0 3px rgba(0,181,176,.12)}
+.lf-input::placeholder{color:var(--lt4);font-size:13px}
+.lf-btn{width:100%;background:var(--tl);color:#fff;border:none;border-radius:12px;padding:15px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;margin-top:6px;transition:all .15s;letter-spacing:-.3px;-webkit-appearance:none}
+.lf-btn:active{background:var(--tld);transform:scale(.98)}
+.lf-err{background:var(--erl);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px 12px;font-size:12px;color:#f87171;margin-top:10px;text-align:center;display:none}
+
+/* ═══ MAIN APP ═══ */
+#s-app{background:var(--dk)}
+
+/* TOP BAR */
+.topbar{height:56px;background:var(--dk2);border-bottom:1px solid rgba(0,181,176,.1);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;position:relative}
+.tb-logo{width:32px;height:26px;object-fit:contain}
+.tb-title{flex:1;font-size:15px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.tb-sub{font-size:10px;color:var(--tl);display:block;font-weight:500;margin-top:1px}
+.tb-user{display:flex;align-items:center;gap:7px;cursor:pointer}
+.tb-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;border:2px solid rgba(0,181,176,.4)}
+.tb-role{font-size:10px;color:var(--lt3);font-weight:600;text-align:right}
+
+/* CONTENT AREA */
+.app-content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(80px + var(--safe-bottom))}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--dk2);border-top:1px solid rgba(0,181,176,.12);display:flex;padding-bottom:var(--safe-bottom);z-index:50}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 8px;cursor:pointer;transition:all .15s;border:none;background:none;gap:4px;min-height:60px}
+.bn-item .ic{font-size:20px;transition:transform .15s}
+.bn-item .lb{font-size:10px;color:var(--lt4);font-weight:600;letter-spacing:-.2px;transition:color .15s}
+.bn-item.on .ic{transform:scale(1.15)}
+.bn-item.on .lb{color:var(--tl)}
+.bn-item:active .ic{transform:scale(.9)}
+
+/* PAGE HEADER */
+.pg-head{padding:20px 16px 0;margin-bottom:16px}
+.pg-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px}
+.pg-sub{font-size:12px;color:var(--lt3);margin-top:3px}
+
+/* CARDS */
+.card{background:var(--dk3);border-radius:var(--r);border:1px solid rgba(0,181,176,.1);margin:0 16px 14px;overflow:hidden}
+.card-head{padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:700;color:var(--lt);letter-spacing:-.2px}
+.card-body{padding:16px}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;margin-bottom:14px}
+.stat-card{background:var(--dk3);border-radius:var(--r);padding:14px 16px;border:1px solid rgba(0,181,176,.1);position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-tl::before{background:var(--tl)} .stat-ok::before{background:var(--ok)}
+.stat-wa::before{background:var(--wa)} .stat-pu::before{background:var(--pu)}
+.stat-pk::before{background:var(--pk)}
+.stat-label{font-size:10px;color:var(--lt3);font-weight:600;letter-spacing:.3px;margin-bottom:8px}
+.stat-val{font-size:24px;font-weight:900;line-height:1}
+.stat-desc{font-size:10px;color:var(--lt4);margin-top:5px}
+
+/* SHIFT TAGS */
+.st{display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap}
+.stA{background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.25)}
+.stB{background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.25)}
+.stC{background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.25)}
+.stD{background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.25)}
+.stOFF{background:rgba(255,255,255,.06);color:var(--lt4);border:1px solid rgba(255,255,255,.08)}
+.stLV{background:rgba(244,114,182,.12);color:#f472b6;border:1px solid rgba(244,114,182,.25)}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{background:rgba(0,181,176,.08);color:var(--lt3);font-weight:600;font-size:10px;padding:8px 10px;text-align:left;border-bottom:1px solid rgba(0,181,176,.12);white-space:nowrap;letter-spacing:.3px}
+.tbl td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;color:var(--lt)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:active td{background:rgba(0,181,176,.05)}
+
+/* BADGES */
+.bdg{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700}
+.btl{background:var(--tll);color:var(--tl)} .bok{background:var(--okl);color:var(--ok)}
+.bwa{background:var(--wal);color:var(--wa)} .ber{background:var(--erl);color:#f87171}
+.bgr{background:rgba(255,255,255,.06);color:var(--lt3)}
+
+/* AVATAR */
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+.c1{background:linear-gradient(135deg,#00b5b0,#009490)} 
+.c2{background:linear-gradient(135deg,#0891b2,#0e7490)} 
+.c3{background:linear-gradient(135deg,#7c3aed,#6d28d9)}
+.c4{background:linear-gradient(135deg,#db2777,#be185d)} 
+.c5{background:linear-gradient(135deg,#059669,#047857)} 
+.c6{background:linear-gradient(135deg,#d97706,#b45309)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:9px 16px;border:none;border-radius:10px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;-webkit-appearance:none}
+.btn:active{transform:scale(.96)}
+.btn-p{background:var(--tl);color:#fff}
+.btn-p:active{background:var(--tld)}
+.btn-g{background:var(--dk4);color:var(--lt2);border:1px solid rgba(255,255,255,.08)}
+.btn-ok{background:rgba(16,185,129,.2);color:var(--ok);border:1px solid rgba(16,185,129,.3)}
+.btn-er{background:rgba(239,68,68,.2);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.btn-sm{padding:6px 12px;font-size:11px;border-radius:8px}
+.btn-full{width:100%}
+
+/* PROGRESS */
+.prog{height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.pf{height:100%;border-radius:3px;background:var(--tl);transition:width .4s}
+
+/* CHIPS */
+.chip{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:14px;font-size:10px;background:rgba(255,255,255,.06);color:var(--lt3);font-weight:600}
+
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.mo.open{display:flex;animation:fi .15s}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.mo-box{background:var(--dk3);border-radius:20px 20px 0 0;width:100%;max-width:500px;max-height:90vh;display:flex;flex-direction:column;animation:su .2s}
+@keyframes su{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mo-head{padding:16px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.mo-title{font-size:15px;font-weight:700;color:#fff}
+.mo-close{background:rgba(255,255,255,.08);border:none;color:var(--lt3);width:28px;height:28px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.mo-body{padding:20px;overflow-y:auto;flex:1}
+.mo-foot{padding:14px 20px;border-top:1px solid rgba(255,255,255,.06);display:flex;gap:8px;flex-shrink:0;padding-bottom:calc(14px + var(--safe-bottom))}
+
+/* FORM */
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:11px;font-weight:700;color:var(--lt3);margin-bottom:6px;letter-spacing:.3px}
+.fc{width:100%;background:var(--dk4);border:1.5px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 13px;color:#fff;font-family:inherit;font-size:14px;outline:none;transition:border-color .15s;-webkit-appearance:none}
+.fc:focus{border-color:var(--tl);box-shadow:0 0 0 3px rgba(0,181,176,.1)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* INFO BOX */
+.ib{background:rgba(0,181,176,.08);border-left:3px solid var(--tl);border-radius:0 8px 8px 0;padding:10px 12px;font-size:12px;color:var(--lt2)}
+
+/* CALENDAR PERSONAL */
+.pcal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.pcal-dh{text-align:center;font-size:10px;font-weight:700;padding:6px 0;color:var(--lt4)}
+.pcal-cell{min-height:58px;border-radius:8px;padding:5px 4px;background:var(--dk4);border:1px solid rgba(255,255,255,.05);cursor:pointer;transition:all .12s}
+.pcal-cell.today{background:rgba(0,181,176,.12);border-color:var(--tl)}
+.pcal-cell.other{background:transparent;border-color:transparent}
+.pcal-cell.sun .pcal-n{color:#f87171}
+.pcal-cell.sat .pcal-n{color:var(--tl)}
+.pcal-n{font-size:12px;font-weight:600;margin-bottom:3px;color:var(--lt)}
+.pcal-cell.today .pcal-n{color:var(--tl);font-weight:800}
+
+/* SCHEDULE ALL - horizontal scroll */
+.sch-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 16px 16px}
+.sch-tbl{border-collapse:collapse;min-width:700px}
+.sch-tbl th{background:var(--dk4);color:var(--lt3);font-size:10px;font-weight:700;padding:7px 5px;text-align:center;border:1px solid rgba(255,255,255,.06);white-space:nowrap;min-width:32px;position:sticky;top:0;z-index:2}
+.sch-tbl th.emp-th{text-align:left;padding:7px 10px;min-width:70px;background:var(--dk3);left:0;z-index:3}
+.sch-tbl th.sun{color:#f87171} .sch-tbl th.sat{color:var(--tl)} .sch-tbl th.tdc{background:rgba(0,181,176,.2)!important;color:var(--tl)!important}
+.sch-tbl td{border:1px solid rgba(255,255,255,.04);padding:4px 3px;text-align:center;vertical-align:middle}
+.sch-tbl td.emp-td{text-align:left;padding:8px 10px;background:var(--dk3);position:sticky;left:0;z-index:1;border-right:1px solid rgba(0,181,176,.15)!important}
+.sch-tbl td.tdc{background:rgba(0,181,176,.06)!important}
+.sch-tbl td.shc{cursor:pointer} .sch-tbl td.shc:active{background:rgba(0,181,176,.12)!important}
+.sch-tbl td.sum-row{background:rgba(255,255,255,.03);font-size:10px;font-weight:600;color:var(--lt3)}
+
+/* PERSON SELECTOR */
+.ps-row{display:flex;gap:8px;overflow-x:auto;padding:0 16px 2px;-webkit-overflow-scrolling:touch}
+.ps-row::-webkit-scrollbar{display:none}
+.ps-btn{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .15s;padding:4px 2px}
+.ps-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;border:2px solid transparent;transition:all .15s}
+.ps-btn.on .ps-av{border-color:var(--tl);box-shadow:0 0 0 3px rgba(0,181,176,.2)}
+.ps-name{font-size:10px;font-weight:600;color:var(--lt4);transition:color .15s;white-space:nowrap}
+.ps-btn.on .ps-name{color:var(--tl)}
+
+/* LIST ITEMS */
+.list-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.04)}
+.list-item:last-child{border-bottom:none}
+.list-item:active{background:rgba(0,181,176,.05)}
+
+/* TOAST */
+#toast{position:fixed;top:72px;left:16px;right:16px;z-index:300;background:var(--dk3);color:#fff;padding:12px 16px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.4);display:none;border-left:3px solid var(--tl);text-align:center}
+#toast.show{display:block;animation:su .18s}
+#toast.tok{border-left-color:var(--ok)} #toast.terr{border-left-color:#ef4444}
+
+/* MISC */
+.sep{height:1px;background:rgba(255,255,255,.05);margin:0 16px}
+.empty{text-align:center;padding:36px 20px;color:var(--lt4)}
+.empty .ei{font-size:36px;margin-bottom:10px}
+.empty p{font-size:12px}
+.tl{color:var(--tl)} .ok{color:var(--ok)} .wa{color:var(--wa)} .er{color:#f87171}
+.sec-label{font-size:10px;font-weight:700;color:var(--lt4);letter-spacing:.8px;padding:14px 16px 6px;text-transform:uppercase}
+</style>
+</head>
+<body>
+<!-- ═══ SCREENS ═══ -->
+
+<!-- LOGIN -->
+<div id="s-login" class="screen active">
+  <div class="login-wrap">
+    <img id="login-logo" src="" alt="logo" class="login-logo">
+    <div class="login-brand">
+      <h1>구좌마을여행사<br>협동조합</h1>
+      <p>GOOD JOB! GUJWA!</p>
+    </div>
+    <div class="login-form">
+      <div class="lf-title">근무 관리 시스템 로그인</div>
+      <div class="lf-group">
+        <label class="lf-label">아이디</label>
+        <input class="lf-input" id="li-id" type="text" placeholder="아이디를 입력하세요" autocomplete="username" autocapitalize="none">
+      </div>
+      <div class="lf-group">
+        <label class="lf-label">비밀번호</label>
+        <input class="lf-input" id="li-pw" type="password" placeholder="비밀번호를 입력하세요" autocomplete="current-password">
+      </div>
+      <button class="lf-btn" onclick="doLogin()">로그인</button>
+      <div class="lf-err" id="li-err">아이디 또는 비밀번호가 올바르지 않습니다</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="s-app" class="screen">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <img id="app-logo" src="" alt="logo" class="tb-logo">
+    <div style="flex:1;min-width:0">
+      <div class="tb-title" id="tb-title">대시보드</div>
+      <span class="tb-sub">구좌마을여행사협동조합</span>
+    </div>
+    <div class="tb-user" onclick="showUserMenu()">
+      <div>
+        <div class="tb-role" id="tb-role">관리자</div>
+      </div>
+      <div class="av tb-av" id="tb-av" style="width:32px;height:32px;font-size:12px"></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="app-content" id="app-content"></div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav" id="bottom-nav"></nav>
+</div>
+
+<div id="toast"></div>
+
+<!-- USER MENU MODAL -->
+<div class="mo" id="mo-user" onclick="if(event.target===this)closeAllMo()">
+  <div class="mo-box" style="border-radius:20px;max-height:auto;margin:16px">
+    <div class="mo-head">
+      <span class="mo-title">내 계정</span>
+      <button class="mo-close" onclick="closeAllMo()">✕</button>
+    </div>
+    <div class="mo-body" id="mo-user-body" style="padding-bottom:30px"></div>
+  </div>
+</div>
+
+<!-- GENERAL MODAL -->
+<div class="mo" id="mo-gen" onclick="if(event.target===this)closeAllMo()">
+  <div class="mo-box">
+    <div class="mo-head">
+      <span class="mo-title" id="mo-gen-title"></span>
+      <button class="mo-close" onclick="closeAllMo()">✕</button>
+    </div>
+    <div class="mo-body" id="mo-gen-body"></div>
+    <div class="mo-foot" id="mo-gen-foot"></div>
+  </div>
+</div>
+
+<script>
+const LOGO_B64='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';
+// ═══════════════════════════════════════════════
+// USERS (id, pw, empIdx or 'admin', role)
+// ═══════════════════════════════════════════════
+const USERS = [
+  {id:'admin',   pw:'gujwa2026!', role:'admin', name:'관리자',    empIdx:null, av:'관', c:'c1'},
+  {id:'kimjh',   pw:'jh1234',     role:'emp',   name:'김지훈',    empIdx:0,   av:'김', c:'c1'},
+  {id:'kanghj',  pw:'hj1234',     role:'emp',   name:'강현진',    empIdx:1,   av:'강', c:'c2'},
+  {id:'minbj',   pw:'bj1234',     role:'emp',   name:'민병제',    empIdx:2,   av:'민', c:'c3'},
+  {id:'leesia',  pw:'sia1234',    role:'emp',   name:'이시아',    empIdx:3,   av:'이', c:'c4'},
+  {id:'kimsy',   pw:'sy1234',     role:'emp',   name:'김선영',    empIdx:4,   av:'김', c:'c5'},
+  {id:'yunhj',   pw:'yhj1234',    role:'emp',   name:'윤희정',    empIdx:5,   av:'윤', c:'c6'},
+];
+
+// ═══ EMPLOYEES ═══
+const EMP = [
+  {id:1,n:'김지훈',av:'김',c:'c1',pos:'매니저'},
+  {id:2,n:'강현진',av:'강',c:'c2',pos:'매니저'},
+  {id:3,n:'민병제',av:'민',c:'c3',pos:'매니저'},
+  {id:4,n:'이시아',av:'이',c:'c4',pos:'매니저'},
+  {id:5,n:'김선영',av:'김',c:'c5',pos:'매니저'},
+  {id:6,n:'윤희정',av:'윤',c:'c6',pos:'매니저'},
+];
+
+const SITES = {
+  A:  {l:'복합센터',s:'복합',c:'stA',col:'#fbbf24'},
+  B:  {l:'사무실',  s:'사무',c:'stB',col:'#60a5fa'},
+  C:  {l:'청굴물',  s:'청굴',c:'stC',col:'#a78bfa'},
+  D:  {l:'어울림',  s:'어울',c:'stD',col:'#34d399'},
+  OFF:{l:'휴무',    s:'OFF', c:'stOFF',col:'#6b7280'},
+  연차:{l:'연차',  s:'연차',c:'stLV',col:'#f472b6'},
+};
+
+const RAW = {
+  '2026-01':{
+    1:['OFF','OFF','OFF','C','C','OFF'],2:['A','B','B','OFF','C','B'],3:['A','OFF','C','C','OFF','A'],
+    4:['OFF','A','A','C','OFF','OFF'],5:['OFF','B','OFF','A','C','B'],6:['A','OFF','OFF','OFF','C','B'],
+    7:['A','B','B','OFF','C','B'],8:['A','B','B','C','C','OFF'],9:['A','B','B','C','OFF','B'],
+    10:['A','OFF','C','C','OFF','A'],11:['OFF','A','OFF','C','OFF','OFF'],12:['OFF','B','OFF','A','C','B'],
+    13:['A','OFF','OFF','OFF','C','OFF'],14:['A','B','B','OFF','C','B'],15:['A','B','B','C','C','B'],
+    16:['A','B','B','C','C','B'],17:['A','B','B','C','C','B'],18:['A','OFF','C','C','C','A'],
+    19:['OFF','A','C','C','OFF','OFF'],20:['OFF','B','OFF','A','C','B'],21:['A','OFF','OFF','OFF','C','OFF'],
+    22:['A','B','B','OFF','C','B'],23:['A','B','B','C','C','B'],24:['A','B','B','C','C','B'],
+    25:['A','OFF','C','C','OFF','B'],26:['OFF','A','A','C','OFF','B'],27:['OFF','A','OFF','C','OFF','B'],
+    28:['A','B','B','A','C','B'],29:['A','OFF','B','OFF','C','OFF'],30:['A','B','B','OFF','C','B'],
+    31:['A','OFF','A','C','OFF','OFF'],
+  },
+  '2026-02':{
+    1:['OFF','A','A','C','OFF','OFF'],2:['OFF','OFF','OFF','A','C','B'],3:['OFF','OFF','OFF','OFF','C','OFF'],
+    4:['B','B','B','C','OFF','OFF'],5:['B','B','OFF','OFF','C','B'],6:['B','B','OFF','OFF','C','B'],
+    7:['OFF','OFF','OFF','OFF','C','OFF'],8:['OFF','OFF','OFF','OFF','C','OFF'],9:['OFF','B','OFF','OFF','C','B'],
+    10:['OFF','OFF','B','C','OFF','OFF'],11:['OFF','OFF','B','OFF','C','B'],12:['B','B','B','OFF','C','B'],
+    13:['B','B','B','OFF','C','B'],14:['OFF','OFF','OFF','C','OFF','OFF'],15:['OFF','OFF','OFF','C','OFF','OFF'],
+    16:['OFF','OFF','OFF','C','OFF','OFF'],17:['OFF','OFF','OFF','OFF','OFF','OFF'],18:['OFF','OFF','OFF','OFF','OFF','OFF'],
+    19:['OFF','OFF','OFF','OFF','C','OFF'],20:['B','B','B','C','OFF','B'],21:['B','B','B','C','OFF','B'],
+    22:['OFF','OFF','OFF','C','OFF','OFF'],23:['OFF','OFF','OFF','C','OFF','OFF'],24:['OFF','B','B','OFF','C','B'],
+    25:['B','OFF','B','OFF','C','OFF'],26:['B','B','B','OFF','C','B'],27:['B','B','B','OFF','C','B'],
+    28:['B','B','B','C','OFF','B'],
+  },
+  '2026-03':{
+    1:['OFF','OFF','OFF','C','OFF','OFF'],2:['OFF','OFF','OFF','C','OFF','OFF'],3:['B','B','B','OFF','C','B'],
+    4:['B','B','B','OFF','C','B'],5:['B','B','B','C','C','B'],6:['B','B','B','C','C','B'],
+    7:['OFF','OFF','OFF','C','OFF','OFF'],8:['OFF','OFF','OFF','C','OFF','OFF'],9:['B','B','연차','OFF','C','B'],
+    10:['B','B','연차','OFF','C','B'],11:['B','B','B','OFF','C','B'],12:['B','B','B','C','C','B'],
+    13:['B','B','B','C','연차','B'],14:['OFF','OFF','OFF','C','OFF','OFF'],15:['OFF','OFF','OFF','C','OFF','OFF'],
+    16:['B','B','B','OFF','C','B'],17:['B','B','B','OFF','C','B'],18:['B','B','B','C','C','B'],
+    19:['B','B','B','C','C','B'],20:['B','B','B','C','C','B'],21:['OFF','OFF','OFF','C','OFF','OFF'],
+    22:['OFF','OFF','OFF','C','OFF','OFF'],23:['B','B','B','OFF','C','B'],24:['B','B','B','OFF','C','B'],
+    25:['B','B','B','C','C','B'],26:['B','B','B','C','C','B'],27:['연차','B','B','C','C','B'],
+    28:['OFF','OFF','OFF','C','C','OFF'],29:['OFF','OFF','OFF','OFF','OFF','OFF'],30:['B','B','B','C','C','B'],
+    31:['B','B','B','OFF','C','B'],
+  }
+};
+
+const EVENTS = {
+  '2026-01-05':'라이즈교육','2026-01-06':'라이즈교육',
+  '2026-01-08':'리서치클러스터','2026-01-09':'리서치클러스터','2026-01-10':'리서치클러스터','2026-01-11':'리서치클러스터',
+  '2026-01-23':'성과공유','2026-01-24':'성과공유',
+  '2026-02-05':'청소년숙박','2026-02-06':'청소년숙박',
+  '2026-02-15':'설연휴','2026-02-16':'설연휴','2026-02-17':'설연휴','2026-02-18':'설날',
+  '2026-02-27':'선진지','2026-02-28':'선진지',
+  '2026-03-01':'삼일절',
+};
+
+const LV3 = [
+  {used:1,annual:10},{used:0,annual:10},{used:2,annual:10},
+  {used:0,annual:10},{used:1,annual:10},{used:0,annual:10},
+];
+
+let lvReqs = [
+  {id:1,empId:3,en:'민병제',type:'연차',s:'2026-03-09',e:'2026-03-10',days:2,r:'개인사정',st:'approved',cr:'2026-03-01'},
+  {id:2,empId:5,en:'김선영',type:'연차',s:'2026-03-13',e:'2026-03-13',days:1,r:'개인사정',st:'approved',cr:'2026-03-05'},
+  {id:3,empId:1,en:'김지훈',type:'연차',s:'2026-03-27',e:'2026-03-27',days:1,r:'개인사정',st:'approved',cr:'2026-03-10'},
+];
+
+// ═══ STATE ═══
+let curUser = null;
+let curPage = '';
+let calMo = '2026-03';
+let schedView = 'all';
+let selEmpIdx = 0;
+
+const TODAY = (()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;})();
+const DN = ['일','월','화','수','목','금','토'];
+
+function gs(mk,d,ei){return (RAW[mk]?.[d]?.[ei])||'OFF';}
+function stag(code,tiny=false){
+  const s=SITES[code]||SITES.OFF;
+  return `<span class="st ${s.c}" style="${tiny?'font-size:10px;padding:2px 6px':''}">${tiny?s.s:s.l}</span>`;
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION CONFIGS
+// ═══════════════════════════════════════════════
+const NAV_ADMIN = [
+  {id:'dash',   l:'홈',      ic:'🏠'},
+  {id:'sch',    l:'스케줄',  ic:'📅'},
+  {id:'leave',  l:'연차',    ic:'🌴'},
+  {id:'stats',  l:'통계',    ic:'📊'},
+  {id:'team',   l:'팀원',    ic:'👥'},
+];
+const NAV_EMP = [
+  {id:'my-home', l:'홈',      ic:'🏠'},
+  {id:'my-sch',  l:'내스케줄',ic:'📅'},
+  {id:'my-leave',l:'연차',    ic:'🌴'},
+  {id:'my-hist', l:'이력',    ic:'📋'},
+];
+
+// ═══ LOGIN ═══════════════════════════════════
+function doLogin(){
+  const id = document.getElementById('li-id').value.trim();
+  const pw = document.getElementById('li-pw').value;
+  const user = USERS.find(u=>u.id===id && u.pw===pw);
+  const err = document.getElementById('li-err');
+  if(!user){
+    err.style.display='block';
+    document.getElementById('li-pw').value='';
+    setTimeout(()=>err.style.display='none',3000);
+    return;
+  }
+  curUser = user;
+  err.style.display='none';
+  document.getElementById('s-login').classList.remove('active');
+  document.getElementById('s-app').classList.add('active');
+  initApp();
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const li=document.getElementById('s-login');
+    if(li.classList.contains('active')) doLogin();
+  }
+});
+
+// ═══ INIT APP ════════════════════════════════
+function initApp(){
+  // topbar user
+  const av = document.getElementById('tb-av');
+  av.textContent = curUser.av;
+  av.className = `av tb-av ${curUser.c}`;
+  document.getElementById('tb-role').textContent = curUser.role==='admin'?'관리자':'직원';
+
+  // nav
+  buildNav();
+  const firstPage = curUser.role==='admin'?'dash':'my-home';
+  go(firstPage);
+}
+
+function buildNav(){
+  const nav = curUser.role==='admin'?NAV_ADMIN:NAV_EMP;
+  const el = document.getElementById('bottom-nav');
+  el.innerHTML = nav.map(n=>`
+    <button class="bn-item ${curPage===n.id?'on':''}" onclick="go('${n.id}')">
+      <span class="ic">${n.ic}</span>
+      <span class="lb">${n.l}</span>
+    </button>`).join('');
+}
+
+const PAGE_TITLES = {
+  dash:'대시보드',sch:'근무 스케줄',leave:'연차 관리',stats:'통계',team:'팀원 현황',
+  'my-home':'내 현황','my-sch':'내 스케줄','my-leave':'연차 신청','my-hist':'배치 이력',
+};
+
+function go(p){
+  curPage=p;
+  buildNav();
+  document.getElementById('tb-title').textContent = PAGE_TITLES[p]||p;
+  const ct = document.getElementById('app-content');
+  ct.scrollTop=0;
+  const pages={dash:pgDash,sch:pgSch,leave:pgLeave,stats:pgStats,team:pgTeam,
+    'my-home':pgMyHome,'my-sch':pgMySch,'my-leave':pgMyLeave,'my-hist':pgMyHist};
+  ct.innerHTML = (pages[p]||(() => '<div class="empty"><p>준비중</p></div>'))();
+  // re-attach events after render
+  afterRender(p);
+}
+
+function afterRender(p){}
+
+// ═══ MODAL ═══════════════════════════════════
+function openMo(id){document.getElementById(id).classList.add('open');}
+function closeAllMo(){document.querySelectorAll('.mo').forEach(m=>m.classList.remove('open'));}
+
+function showGenMo(title,body,foot=''){
+  document.getElementById('mo-gen-title').textContent=title;
+  document.getElementById('mo-gen-body').innerHTML=body;
+  document.getElementById('mo-gen-foot').innerHTML=foot;
+  openMo('mo-gen');
+}
+
+function showUserMenu(){
+  const isAdmin = curUser.role==='admin';
+  const empInfo = isAdmin?'':(() => {
+    const ei = curUser.empIdx;
+    const lv = LV3[ei]||{used:0,annual:10};
+    return `<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)">
+      <div class="sec-label" style="padding:0 0 8px">연차 현황</div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;color:var(--lt3)">잔여 연차</span>
+        <span style="font-size:14px;font-weight:800;color:var(--tl)">${lv.annual-lv.used}일</span>
+      </div>
+      <div class="prog"><div class="pf" style="width:${Math.round(lv.used/lv.annual*100)}%"></div></div>
+      <div style="font-size:10px;color:var(--lt4);margin-top:4px">${lv.used}일 사용 / ${lv.annual}일</div>
+    </div>`;
+  })();
+
+  document.getElementById('mo-user-body').innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <div class="av ${curUser.c}" style="width:52px;height:52px;font-size:20px">${curUser.av}</div>
+      <div>
+        <div style="font-size:18px;font-weight:800;color:#fff">${curUser.name}</div>
+        <div style="font-size:12px;color:var(--tl);margin-top:2px">${isAdmin?'관리자':'매니저'} · @${curUser.id}</div>
+      </div>
+    </div>
+    <div style="background:var(--dk4);border-radius:10px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--lt3);margin-bottom:4px">로그인 계정</div>
+      <div style="font-size:13px;font-weight:600">ID: <span style="color:var(--tl)">${curUser.id}</span></div>
+    </div>
+    ${empInfo}
+    <button class="btn btn-er btn-full" style="margin-top:18px" onclick="doLogout()">로그아웃</button>
+  `;
+  openMo('mo-user');
+}
+
+function doLogout(){
+  closeAllMo();
+  curUser=null; curPage='';
+  document.getElementById('s-app').classList.remove('active');
+  document.getElementById('s-login').classList.add('active');
+  document.getElementById('li-id').value='';
+  document.getElementById('li-pw').value='';
+}
+
+// ═══ TOAST ═══════════════════════════════════
+function toast(msg,type=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='show'+(type?' t'+type:'');
+  setTimeout(()=>{el.className='';},2400);
+}
+
+// ═══ PAGE: DASH (ADMIN) ══════════════════════
+function pgDash(){
+  const td=new Date().getDate();
+  const shifts=EMP.map((e,i)=>({e,s:gs(calMo,td,i)}));
+  const onDuty=shifts.filter(x=>x.s!=='OFF'&&x.s!=='연차').length;
+  const pend=lvReqs.filter(r=>r.st==='pending').length;
+  const todEv=EVENTS[TODAY]||'';
+
+  const siteCnt={A:0,B:0,C:0,D:0};
+  shifts.forEach(({s})=>{if(siteCnt[s]!==undefined)siteCnt[s]++;});
+
+  return `
+    <div class="pg-head">
+      <div class="pg-title">안녕하세요 👋</div>
+      <div class="pg-sub">${TODAY} ${todEv?`· 📌 ${todEv}`:''}</div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card stat-tl">
+        <div class="stat-label">오늘 출근</div>
+        <div class="stat-val tl">${onDuty}<span style="font-size:14px;font-weight:500">명</span></div>
+        <div class="stat-desc">전체 ${EMP.length}명 중</div>
+      </div>
+      <div class="stat-card stat-ok">
+        <div class="stat-label">3월 연차 사용</div>
+        <div class="stat-val ok">${LV3.reduce((a,b)=>a+b.used,0)}<span style="font-size:14px">일</span></div>
+        <div class="stat-desc">팀 전체 합계</div>
+      </div>
+      <div class="stat-card stat-wa">
+        <div class="stat-label">승인 대기</div>
+        <div class="stat-val wa">${pend}<span style="font-size:14px">건</span></div>
+        <div class="stat-desc">${pend>0?'처리 필요':'없음'}</div>
+      </div>
+      <div class="stat-card stat-pu">
+        <div class="stat-label">조회 월</div>
+        <div class="stat-val" style="font-size:16px;color:var(--pu)">3월</div>
+        <div class="stat-desc">2026년</div>
+      </div>
+    </div>
+
+    <div class="sec-label">오늘 사업장 배치</div>
+    <div class="card">
+      <div class="card-body" style="padding:10px 14px">
+        ${Object.entries(siteCnt).map(([k,v])=>`
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            ${stag(k,true)}
+            <div style="flex:1"><div class="prog" style="height:4px"><div class="pf" style="width:${EMP.length?Math.round(v/EMP.length*100):0}%;background:${SITES[k].col}"></div></div></div>
+            <span style="font-size:13px;font-weight:700;color:var(--lt);min-width:20px;text-align:right">${v}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="sec-label">오늘 출근 현황</div>
+    <div class="card">
+      ${shifts.map(({e,s})=>`
+        <div class="list-item">
+          <div class="av ${e.c}" style="width:34px;height:34px;font-size:13px">${e.av}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">${e.n}</div>
+            <div style="font-size:11px;color:var(--lt4);margin-top:1px">${e.pos}</div>
+          </div>
+          ${stag(s,true)}
+        </div>`).join('')}
+    </div>
+
+    ${pend>0?`
+    <div class="sec-label">연차 승인 대기 <span class="bdg bwa" style="margin-left:4px">${pend}</span></div>
+    <div class="card">
+      ${lvReqs.filter(r=>r.st==='pending').map(r=>`
+        <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:13px;font-weight:700">${r.en}</div>
+            <span class="bdg btl">${r.type} ${r.days}일</span>
+          </div>
+          <div style="font-size:11px;color:var(--lt4);margin-bottom:8px">${r.s}${r.s!==r.e?' ~ '+r.e:''} · ${r.r}</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ok btn-sm" style="flex:1" onclick="appLv(${r.id},true)">✓ 승인</button>
+            <button class="btn btn-er btn-sm" style="flex:1" onclick="appLv(${r.id},false)">✕ 반려</button>
+          </div>
+        </div>`).join('')}
+    </div>`:''}
+
+    <div class="sec-label">3월 일정</div>
+    <div class="card">
+      <div class="card-body" style="padding:8px 14px">
+        ${Object.entries(EVENTS).filter(([d])=>d.startsWith('2026-03')).map(([d,ev])=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+            <span class="chip">${d.slice(8)}일</span>
+            <span style="font-size:12px;color:var(--lt2)">${ev}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div style="height:10px"></div>`;
+}
+
+// ═══ PAGE: SCHEDULE (ADMIN) ══════════════════
+function pgSch(){
+  const months=Object.keys(RAW).sort();
+  return `
+    <div style="padding:16px 16px 10px;display:flex;gap:6px">
+      ${months.map(mk=>`<button class="btn ${calMo===mk?'btn-p':'btn-g'} btn-sm" onclick="calMo='${mk}';go('sch')">${mk.slice(5)}월</button>`).join('')}
+    </div>
+    <div style="display:flex;gap:6px;padding:0 16px 12px">
+      <button class="btn ${schedView==='all'?'btn-p':'btn-g'} btn-sm" onclick="schedView='all';go('sch')">📋 전체</button>
+      <button class="btn ${schedView==='personal'?'btn-p':'btn-g'} btn-sm" onclick="schedView='personal';go('sch')">👤 개인</button>
+    </div>
+    ${schedView==='all'?renderSchAll():renderSchPersonal(true)}`;
+}
+
+function renderSchAll(){
+  const [y,m]=calMo.split('-');
+  const last=new Date(+y,+m,0).getDate();
+  let hdr=`<th class="emp-th">팀원</th>`;
+  for(let d=1;d<=last;d++){
+    const dow=new Date(+y,+m-1,d).getDay();
+    const ds=`${calMo}-${String(d).padStart(2,'0')}`;
+    const isT=ds===TODAY;
+    hdr+=`<th class="${dow===0?'sun':dow===6?'sat':''}${isT?' tdc':''}">${d}<br><span style="font-size:8px;font-weight:400">${DN[dow]}</span></th>`;
+  }
+  hdr+=`<th>복</th><th>사</th><th>청</th><th>어</th><th>OFF</th>`;
+
+  let rows='';
+  EMP.forEach((emp,ei)=>{
+    const cnt={A:0,B:0,C:0,D:0,OFF:0,연차:0};
+    let cells='';
+    for(let d=1;d<=last;d++){
+      const s=gs(calMo,d,ei); cnt[s]=(cnt[s]||0)+1;
+      const si=SITES[s]||SITES.OFF;
+      const ds=`${calMo}-${String(d).padStart(2,'0')}`;
+      cells+=`<td class="shc${ds===TODAY?' tdc':''}" onclick="editShift('${calMo}',${d},${ei})">
+        <span style="font-size:9px;font-weight:700;color:${si.col}">${si.s}</span>
+      </td>`;
+    }
+    rows+=`<tr>
+      <td class="emp-td">
+        <div style="display:flex;align-items:center;gap:5px">
+          <div class="av ${emp.c}" style="width:20px;height:20px;font-size:8px">${emp.av}</div>
+          <span style="font-size:11px;font-weight:600">${emp.n.slice(0,3)}</span>
+        </div>
+      </td>
+      ${cells}
+      <td class="sum-row">${cnt.A}</td><td class="sum-row">${cnt.B}</td>
+      <td class="sum-row">${cnt.C}</td><td class="sum-row">${cnt.D}</td><td class="sum-row">${cnt.OFF}</td>
+    </tr>`;
+  });
+
+  // 합계 행
+  ['A','B','C','D'].forEach(k=>{
+    let cells='';
+    for(let d=1;d<=last;d++){
+      let n=0; EMP.forEach((_,ei)=>{if(gs(calMo,d,ei)===k)n++;});
+      const ds=`${calMo}-${String(d).padStart(2,'0')}`;
+      cells+=`<td class="sum-row${ds===TODAY?' tdc':''}" style="font-size:9px;color:${SITES[k].col}">${n||'-'}</td>`;
+    }
+    rows+=`<tr><td class="emp-td" style="font-size:9px;color:var(--lt4)">${SITES[k].s}계</td>${cells}<td colspan="5"></td></tr>`;
+  });
+
+  return `<div class="sch-wrap"><table class="sch-tbl"><thead><tr>${hdr}</tr></thead><tbody>${rows}</tbody></table></div>
+    <div style="padding:0 16px;font-size:10px;color:var(--lt4)">💡 셀 탭하면 배치 변경</div>
+    <div style="height:16px"></div>`;
+}
+
+function renderSchPersonal(isAdmin=false){
+  // person selector
+  const sel = `
+    <div style="padding:0 0 12px">
+      <div class="ps-row">
+        ${EMP.map((e,i)=>`
+          <div class="ps-btn ${selEmpIdx===i?'on':''}" onclick="selEmpIdx=${i};go('sch')">
+            <div class="av ${e.c} ps-av" style="width:40px;height:40px;font-size:14px">${e.av}</div>
+            <span class="ps-name">${e.n.slice(0,3)}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  return sel + renderEmpCal(selEmpIdx);
+}
+
+function renderEmpCal(ei){
+  const [y,m]=calMo.split('-');
+  const last=new Date(+y,+m,0).getDate();
+  const first=new Date(+y,+m-1,1);
+  const cnt={A:0,B:0,C:0,D:0,OFF:0,연차:0};
+  for(let d=1;d<=last;d++) cnt[gs(calMo,d,ei)]=(cnt[gs(calMo,d,ei)]||0)+1;
+
+  let cells='';
+  for(let i=0;i<first.getDay();i++) cells+=`<div class="pcal-cell other"></div>`;
+  for(let d=1;d<=last;d++){
+    const date=new Date(+y,+m-1,d);
+    const ds=`${calMo}-${String(d).padStart(2,'0')}`;
+    const s=gs(calMo,d,ei); const si=SITES[s]||SITES.OFF;
+    const isT=ds===TODAY, dow=date.getDay();
+    cells+=`<div class="pcal-cell${isT?' today':''}${dow===0?' sun':dow===6?' sat':''}">
+      <div class="pcal-n">${d}</div>
+      <span style="font-size:9px;font-weight:700;color:${si.col}">${si.s}</span>
+    </div>`;
+  }
+
+  const emp=EMP[ei];
+  return `
+    <div style="padding:0 16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div class="av ${emp.c}" style="width:36px;height:36px;font-size:14px">${emp.av}</div>
+        <div>
+          <div style="font-size:15px;font-weight:800">${emp.n}</div>
+          <div style="font-size:11px;color:var(--lt4)">${calMo.replace('2026-','26년 ')}월</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">
+          ${Object.entries(cnt).filter(([,v])=>v>0).map(([k,v])=>`<span style="font-size:10px;font-weight:700;color:${(SITES[k]||SITES.OFF).col}">${(SITES[k]||SITES.OFF).s} ${v}</span>`).join('  ')}
+        </div>
+      </div>
+      <div class="pcal" style="margin-bottom:4px">
+        ${DN.map((d,i)=>`<div class="pcal-dh" style="${i===0?'color:#f87171':i===6?'color:var(--tl)':''}">${d}</div>`).join('')}
+      </div>
+      <div class="pcal">${cells}</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">일별 배치</span></div>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>날짜</th><th>요일</th><th>배치</th></tr></thead>
+        <tbody>
+          ${Array.from({length:last},(_,i)=>{
+            const d=i+1,date=new Date(+y,+m-1,d),s=gs(calMo,d,ei);
+            const dow=date.getDay(),ds=`${calMo}-${String(d).padStart(2,'0')}`;
+            return `<tr${ds===TODAY?' style="background:rgba(0,181,176,.06)"':''}>
+              <td style="font-weight:${ds===TODAY?700:400}">${calMo.slice(5)}/${String(d).padStart(2,'0')}${ds===TODAY?' 📍':''}</td>
+              <td style="color:${dow===0?'#f87171':dow===6?'var(--tl)':'var(--lt4)'};">${DN[dow]}</td>
+              <td>${stag(s,true)}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>
+    </div>
+    <div style="height:10px"></div>`;
+}
+
+// ═══ PAGE: LEAVE (ADMIN) ════════════════════
+function pgLeave(){
+  const pend=lvReqs.filter(r=>r.st==='pending');
+  return `
+    <div class="pg-head">
+      <div class="pg-title">연차 관리</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">팀원별 연차 현황</span>
+        <button class="btn btn-p btn-sm" onclick="showLeaveReqMo()">+ 신청</button>
+      </div>
+      ${EMP.map((emp,i)=>{
+        const lv=LV3[i]||{used:0,annual:10};
+        return `<div class="list-item">
+          <div class="av ${emp.c}" style="width:34px;height:34px;font-size:12px">${emp.av}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px">${emp.n}</div>
+            <div class="prog"><div class="pf" style="width:${Math.round(lv.used/lv.annual*100)}%;background:${lv.used/lv.annual>.8?'var(--wa)':'var(--tl)'}"></div></div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;margin-left:10px">
+            <div style="font-size:13px;font-weight:800;color:var(--tl)">${lv.annual-lv.used}일</div>
+            <div style="font-size:10px;color:var(--lt4)">${lv.used}/${lv.annual}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    ${pend.length?`
+    <div class="sec-label">승인 대기 <span class="bdg bwa">${pend.length}</span></div>
+    <div class="card">
+      ${pend.map(r=>`
+        <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04)">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-weight:700">${r.en}</span>
+            <span class="bdg btl">${r.type} ${r.days}일</span>
+          </div>
+          <div style="font-size:11px;color:var(--lt4);margin-bottom:8px">${r.s} ~ ${r.e} · ${r.r}</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ok btn-sm" style="flex:1" onclick="appLv(${r.id},true)">✓ 승인</button>
+            <button class="btn btn-er btn-sm" style="flex:1" onclick="appLv(${r.id},false)">✕ 반려</button>
+          </div>
+        </div>`).join('')}
+    </div>`:''}
+
+    <div class="sec-label">전체 신청 이력</div>
+    <div class="card">
+      ${[...lvReqs].reverse().map(r=>{
+        const b=r.st==='approved'?'<span class="bdg bok">승인</span>':r.st==='pending'?'<span class="bdg bwa">대기</span>':'<span class="bdg ber">반려</span>';
+        return `<div class="list-item" style="flex-wrap:wrap;gap:6px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:700">${r.en} · <span class="bdg btl">${r.type}</span></div>
+            <div style="font-size:11px;color:var(--lt4);margin-top:2px">${r.s}${r.s!==r.e?' ~ '+r.e:''} (${r.days}일) · ${r.r}</div>
+          </div>
+          ${b}
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="height:10px"></div>`;
+}
+
+// ═══ PAGE: STATS (ADMIN) ════════════════════
+function pgStats(){
+  const months=Object.keys(RAW).sort();
+  const [y,m]=calMo.split('-');
+  const last=new Date(+y,+m,0).getDate();
+  const tot={A:0,B:0,C:0,D:0,OFF:0,연차:0};
+  EMP.forEach((_,ei)=>{for(let d=1;d<=last;d++){const s=gs(calMo,d,ei);tot[s]=(tot[s]||0)+1;}});
+
+  return `
+    <div style="padding:16px 16px 10px;display:flex;gap:6px">
+      ${months.map(mk=>`<button class="btn ${calMo===mk?'btn-p':'btn-g'} btn-sm" onclick="calMo='${mk}';go('stats')">${mk.slice(5)}월</button>`).join('')}
+    </div>
+    <div class="stat-grid">
+      ${['A','B','C','D'].map(k=>`
+        <div class="stat-card stat-tl">
+          <div class="stat-label">${SITES[k].l}</div>
+          <div class="stat-val" style="color:${SITES[k].col}">${tot[k]}</div>
+          <div class="stat-desc">근무일 합계</div>
+        </div>`).join('')}
+    </div>
+    <div class="sec-label">팀원별 배치 통계</div>
+    <div class="card">
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>팀원</th><th>복합</th><th>사무</th><th>청굴</th><th>어울</th><th>OFF</th><th>연차</th><th>총</th></tr></thead>
+        <tbody>
+          ${EMP.map((emp,ei)=>{
+            const cnt={A:0,B:0,C:0,D:0,OFF:0,연차:0};
+            for(let d=1;d<=last;d++) cnt[gs(calMo,d,ei)]=(cnt[gs(calMo,d,ei)]||0)+1;
+            const total=cnt.A+cnt.B+cnt.C+cnt.D+cnt['연차'];
+            return `<tr>
+              <td><div style="display:flex;align-items:center;gap:5px">
+                <div class="av ${emp.c}" style="width:20px;height:20px;font-size:8px">${emp.av}</div>
+                ${emp.n.slice(0,3)}
+              </div></td>
+              <td style="color:${SITES.A.col};font-weight:600">${cnt.A}</td>
+              <td style="color:${SITES.B.col};font-weight:600">${cnt.B}</td>
+              <td style="color:${SITES.C.col};font-weight:600">${cnt.C}</td>
+              <td style="color:${SITES.D.col};font-weight:600">${cnt.D}</td>
+              <td style="color:var(--lt4)">${cnt.OFF}</td>
+              <td style="color:var(--pk)">${cnt['연차']||0}</td>
+              <td style="font-weight:800">${total}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>
+    </div>
+    <div style="height:10px"></div>`;
+}
+
+// ═══ PAGE: TEAM (ADMIN) ═════════════════════
+function pgTeam(){
+  return `
+    <div class="pg-head"><div class="pg-title">팀원 현황</div></div>
+    <div class="sec-label">계정 정보</div>
+    <div class="card">
+      ${USERS.filter(u=>u.role==='emp').map(u=>{
+        const ei=u.empIdx, lv=LV3[ei]||{used:0,annual:10};
+        return `<div class="list-item">
+          <div class="av ${u.c}" style="width:38px;height:38px;font-size:14px">${u.av}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700">${u.name}</div>
+            <div style="font-size:11px;color:var(--tl);margin-top:1px">@${u.id} · 비밀번호: ${u.pw}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:var(--lt4)">연차</div>
+            <div style="font-size:13px;font-weight:800;color:var(--tl)">${lv.annual-lv.used}일</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="sec-label">관리자 계정</div>
+    <div class="card">
+      ${USERS.filter(u=>u.role==='admin').map(u=>`
+        <div class="list-item">
+          <div class="av ${u.c}" style="width:38px;height:38px;font-size:14px">${u.av}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700">${u.name}</div>
+            <div style="font-size:11px;color:var(--tl);margin-top:1px">@${u.id} · 비밀번호: ${u.pw}</div>
+          </div>
+          <span class="bdg bwa">관리자</span>
+        </div>`).join('')}
+    </div>
+    <div style="height:10px"></div>`;
+}
+
+// ═══ EMPLOYEE PAGES ══════════════════════════
+function pgMyHome(){
+  const ei=curUser.empIdx;
+  const td=new Date().getDate();
+  const myS=gs(calMo,td,ei);
+  const lv=LV3[ei]||{used:0,annual:10};
+  const myLv=lvReqs.filter(r=>r.empId===EMP[ei].id);
+  const now=new Date(), sun=new Date(now); sun.setDate(now.getDate()-now.getDay());
+  const week=Array.from({length:7},(_,i)=>{
+    const d=new Date(sun); d.setDate(sun.getDate()+i);
+    const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    return {d,ds,s:gs(calMo,d.getDate(),ei),isT:ds===TODAY};
+  });
+
+  return `
+    <div class="pg-head">
+      <div class="pg-title">안녕하세요 👋</div>
+      <div class="pg-sub">${curUser.name} 매니저</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card stat-tl">
+        <div class="stat-label">오늘 배치</div>
+        <div style="margin-top:6px">${stag(myS,true)}</div>
+        <div class="stat-desc">${(SITES[myS]||SITES.OFF).l}</div>
+      </div>
+      <div class="stat-card stat-ok">
+        <div class="stat-label">잔여 연차</div>
+        <div class="stat-val ok">${lv.annual-lv.used}<span style="font-size:14px">일</span></div>
+        <div class="stat-desc">${lv.used}일 사용</div>
+      </div>
+    </div>
+
+    <div class="sec-label">이번 주 스케줄</div>
+    <div class="card">
+      ${week.map(({d,s,isT})=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.04);${isT?'background:rgba(0,181,176,.06)':''}">
+          <div style="width:42px;text-align:center;flex-shrink:0">
+            <div style="font-size:10px;color:${d.getDay()===0?'#f87171':d.getDay()===6?'var(--tl)':'var(--lt4)'};">${DN[d.getDay()]}</div>
+            <div style="font-size:16px;font-weight:${isT?800:500};color:${isT?'var(--tl)':'var(--lt)'}">${d.getDate()}</div>
+          </div>
+          <div style="flex:1">${stag(s,true)}</div>
+          ${isT?'<span style="font-size:10px;color:var(--tl);font-weight:700">TODAY</span>':''}
+        </div>`).join('')}
+    </div>
+
+    <div class="sec-label">내 연차 현황</div>
+    <div class="card">
+      ${myLv.length===0?'<div class="empty"><div class="ei">📋</div><p>신청 내역이 없습니다</p></div>'
+        :myLv.slice().reverse().map(r=>{
+          const b=r.st==='approved'?'<span class="bdg bok">승인</span>':r.st==='pending'?'<span class="bdg bwa">대기</span>':'<span class="bdg ber">반려</span>';
+          return `<div class="list-item">
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:700">${r.type} ${r.days}일</div>
+              <div style="font-size:11px;color:var(--lt4);margin-top:2px">${r.s}${r.s!==r.e?' ~ '+r.e:''} · ${r.r}</div>
+            </div>
+            ${b}
+          </div>`;
+        }).join('')}
+      <div style="padding:12px 16px">
+        <button class="btn btn-p btn-full" onclick="showLeaveReqMo()">+ 연차 신청</button>
+      </div>
+    </div>
+    <div style="height:10px"></div>`;
+}
+
+function pgMySch(){
+  const months=Object.keys(RAW).sort();
+  const ei=curUser.empIdx;
+  return `
+    <div style="padding:16px 16px 10px;display:flex;gap:6px">
+      ${months.map(mk=>`<button class="btn ${calMo===mk?'btn-p':'btn-g'} btn-sm" onclick="calMo='${mk}';go('my-sch')">${mk.slice(5)}월</button>`).join('')}
+    </div>
+    ${renderEmpCal(ei)}`;
+}
+
+function pgMyLeave(){
+  const ei=curUser.empIdx;
+  const lv=LV3[ei]||{used:0,annual:10};
+  const myLv=lvReqs.filter(r=>r.empId===EMP[ei].id);
+  return `
+    <div class="pg-head"><div class="pg-title">연차 신청</div></div>
+    <div class="stat-grid" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="stat-card stat-ok"><div class="stat-label">잔여</div><div class="stat-val ok">${lv.annual-lv.used}</div><div class="stat-desc">일</div></div>
+      <div class="stat-card stat-wa"><div class="stat-label">사용</div><div class="stat-val wa">${lv.used}</div><div class="stat-desc">일</div></div>
+      <div class="stat-card stat-pu"><div class="stat-label">연간</div><div class="stat-val" style="color:var(--pu)">${lv.annual}</div><div class="stat-desc">일</div></div>
+    </div>
+    <div style="padding:0 16px;margin-bottom:14px">
+      <button class="btn btn-p btn-full" onclick="showLeaveReqMo()">+ 연차 신청하기</button>
+    </div>
+    <div class="sec-label">신청 이력</div>
+    <div class="card">
+      ${myLv.length===0?'<div class="empty"><div class="ei">🌴</div><p>신청 내역이 없습니다</p></div>'
+        :myLv.slice().reverse().map(r=>{
+          const b=r.st==='approved'?'<span class="bdg bok">승인</span>':r.st==='pending'?'<span class="bdg bwa">대기</span>':'<span class="bdg ber">반려</span>';
+          return `<div class="list-item">
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:700">${r.type} ${r.days}일</div>
+              <div style="font-size:11px;color:var(--lt4);margin-top:2px">${r.s}${r.s!==r.e?' ~ '+r.e:''}</div>
+              <div style="font-size:11px;color:var(--lt4)">${r.r}</div>
+            </div>
+            ${b}
+          </div>`;
+        }).join('')}
+    </div>
+    <div style="height:10px"></div>`;
+}
+
+function pgMyHist(){
+  const months=Object.keys(RAW).sort();
+  const ei=curUser.empIdx;
+  const [y,m]=calMo.split('-');
+  const last=new Date(+y,+m,0).getDate();
+  const cnt={A:0,B:0,C:0,D:0,OFF:0,연차:0};
+  for(let d=1;d<=last;d++) cnt[gs(calMo,d,ei)]=(cnt[gs(calMo,d,ei)]||0)+1;
+
+  return `
+    <div style="padding:16px 16px 10px;display:flex;gap:6px">
+      ${months.map(mk=>`<button class="btn ${calMo===mk?'btn-p':'btn-g'} btn-sm" onclick="calMo='${mk}';go('my-hist')">${mk.slice(5)}월</button>`).join('')}
+    </div>
+    <div style="display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto">
+      ${Object.entries(cnt).filter(([,v])=>v>0).map(([k,v])=>`
+        <div style="flex-shrink:0;text-align:center;background:var(--dk3);border-radius:10px;padding:10px 14px;border:1px solid rgba(255,255,255,.06)">
+          <div style="font-size:10px;color:${(SITES[k]||SITES.OFF).col};font-weight:700;margin-bottom:4px">${(SITES[k]||SITES.OFF).s}</div>
+          <div style="font-size:20px;font-weight:800;color:${(SITES[k]||SITES.OFF).col}">${v}</div>
+          <div style="font-size:9px;color:var(--lt4)">일</div>
+        </div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>날짜</th><th>요일</th><th>배치</th></tr></thead>
+        <tbody>
+          ${Array.from({length:last},(_,i)=>{
+            const d=i+1,date=new Date(+y,+m-1,d),s=gs(calMo,d,ei);
+            const dow=date.getDay(),ds=`${calMo}-${String(d).padStart(2,'0')}`;
+            return `<tr${ds===TODAY?' style="background:rgba(0,181,176,.06)"':''}>
+              <td style="font-weight:${ds===TODAY?700:400}">${calMo.slice(5)}/${String(d).padStart(2,'0')}${ds===TODAY?' 📍':''}</td>
+              <td style="color:${dow===0?'#f87171':dow===6?'var(--tl)':'var(--lt4)'}">${DN[dow]}</td>
+              <td>${stag(s,true)}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>
+    </div>
+    <div style="height:10px"></div>`;
+}
+
+// ═══ ACTIONS ════════════════════════════════
+function appLv(id,ok){
+  const r=lvReqs.find(x=>x.id===id);
+  if(!r) return;
+  r.st=ok?'approved':'rejected';
+  if(ok){const ei=EMP.findIndex(e=>e.id===r.empId);if(ei>=0&&LV3[ei])LV3[ei].used+=r.days;}
+  toast(ok?'✅ 연차가 승인되었습니다':'❌ 연차가 반려되었습니다',ok?'tok':'terr');
+  go(curPage);
+}
+
+function editShift(mk,day,ei){
+  const cur=gs(mk,+day,ei);
+  const emp=EMP[ei];
+  showGenMo(
+    `배치 변경 · ${emp.n}`,
+    `<div class="fg"><label class="fl">날짜</label><input class="fc" value="${mk}-${String(day).padStart(2,'0')}" disabled></div>
+     <div class="fg"><label class="fl">배치 사업장</label>
+       <select class="fc" id="sh-site">${Object.entries(SITES).map(([k,v])=>`<option value="${k}"${cur===k?' selected':''}>${v.l} (${k})</option>`).join('')}</select>
+     </div>
+     <div class="ib">현재: ${stag(cur,true)}</div>`,
+    `<button class="btn btn-g" style="flex:1" onclick="closeAllMo()">취소</button>
+     <button class="btn btn-p" style="flex:1" onclick="saveShift('${mk}',${day},${ei})">저장</button>`
+  );
+}
+
+function saveShift(mk,day,ei){
+  const site=document.getElementById('sh-site').value;
+  if(!RAW[mk])RAW[mk]={};
+  if(!RAW[mk][day])RAW[mk][day]=EMP.map(()=>'OFF');
+  RAW[mk][day][ei]=site;
+  closeAllMo(); toast('✅ 배치가 저장되었습니다','tok'); go(curPage);
+}
+
+function showLeaveReqMo(){
+  const isAdmin=curUser.role==='admin';
+  showGenMo(
+    '연차 신청',
+    `${isAdmin?`<div class="fg"><label class="fl">신청자</label>
+       <select class="fc" id="lv-emp">${EMP.map((e,i)=>`<option value="${i}">${e.n}</option>`).join('')}</select>
+     </div>`:''}
+     <div class="fg"><label class="fl">종류</label>
+       <select class="fc" id="lv-type"><option>연차</option><option>반차</option><option>병가</option><option>경조사</option></select>
+     </div>
+     <div class="fr">
+       <div class="fg"><label class="fl">시작일</label><input type="date" class="fc" id="lv-s" value="${TODAY}"></div>
+       <div class="fg"><label class="fl">종료일</label><input type="date" class="fc" id="lv-e" value="${TODAY}"></div>
+     </div>
+     <div class="fg"><label class="fl">사유</label><input type="text" class="fc" id="lv-r" placeholder="사유 입력"></div>`,
+    `<button class="btn btn-g" style="flex:1" onclick="closeAllMo()">취소</button>
+     <button class="btn btn-p" style="flex:1" onclick="submitLv()">신청</button>`
+  );
+}
+
+function submitLv(){
+  const isAdmin=curUser.role==='admin';
+  const ei=isAdmin?+document.getElementById('lv-emp').value:curUser.empIdx;
+  const type=document.getElementById('lv-type').value;
+  const s=document.getElementById('lv-s').value;
+  const e=document.getElementById('lv-e').value;
+  const r=document.getElementById('lv-r').value;
+  if(!r){toast('사유를 입력해주세요','terr');return;}
+  const days=type==='반차'?.5:Math.max(1,Math.ceil((new Date(e)-new Date(s))/864e5)+1);
+  const emp=EMP[ei];
+  lvReqs.push({id:Date.now(),empId:emp.id,en:emp.n,type,s,e,days,r,st:'pending',cr:TODAY});
+  closeAllMo(); toast('✅ 연차 신청이 완료되었습니다','tok'); go(curPage);
+}
+
+// ═══ INIT LOGO ═══════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  const src=`data:image/png;base64,${LOGO_B64}`;
+  document.getElementById('login-logo').src=src;
+  document.getElementById('app-logo').src=src;
+});
+
+</script>
+</body>
+</html>
